@@ -87,6 +87,7 @@
                     if (assets[i].key == "1000896")
                     {
                         gazua10Bal = assets[i].value;
+                        break;
                     }
                 }
                 $("#gazua10Balance").html("Your Gazua (TRC10) Balance: " + gazua10Bal);
@@ -104,6 +105,7 @@ $("#button").click( async function() {
     console.log("button clicked");
     const swapContract = await tronWeb.contract().at("TPJz9YPDCnSjKEhreAcbzSK743z2pd27rS");
     var realValue = eth.value;
+    console.log(realValue);
     await swapContract.swapGazua().send({tokenId:1000896,tokenValue:realValue})
     console.log("click process finished");
 });
