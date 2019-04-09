@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta http-equiv="X-UA-Compatible" content="ie=edge">
+ <script src="tronweb.js"></script>
+ <script src="utils.js"></script>
+
+
+ <title>Gazua Token Swap</title>
+<link rel="stylesheet" type="text/css" href="index.css">
+<!--<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>-->
+</head>
+<body>
+ <div class="container">
+<h1>Gazua Token Swap</h1>
+<h2 id="tokenPrice"></h2>
+<h3 id="gazua10Balance"></h3>
+<h3 id="gazua20Balance"></h3>
+<label for="eth" class="col-lg-2 control-label">Amount to swap: </label>
+ <input id="eth" type="text">
+<button id="button">Swap Gazua TRC10 to Gazua TRC20</button>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script>
+
+ var gazua20Bal = 0;
+ 
+ window.onload = async function() {
+                console.log("DOM/Window loaded.");
+                const initializeTronWeb = async () => {
+                    const TRONGRID_API_FULL = "https://api.shasta.trongrid.io";
+                    const TRONGRID_API_SOL = "https://api.shasta.trongrid.io";
+                    const TRONGRID_API_EVENT = "https://api.shasta.trongrid.io";
+                    // const TRONGRID_API_FULL = "https://api.trongrid.io";
+                    // const TRONGRID_API_SOL = "https://api.trongrid.io";
+                    // const TRONGRID_API_EVENT = "https://api.trongrid.io";
+                    window.tronWeb = new TronWeb(TRONGRID_API_FULL, TRONGRID_API_SOL, TRONGRID_API_EVENT);
+                    await Utils.setTronWeb(window.tronWeb);
+                };
+                if (!window.tronWeb) {
+                    console.error("Using TRON Foundation address...");
+                    const FOUNDATION_ADDRESS = "TWiWt5SEDzaEqS6kE5gandWMNfxR2B5xzg";
+                    // Set default address (foundation address) used for contract calls
+                    // Directly overwrites the address object as TronLink disabled the
+                    // function call
+                    window.tronWeb.defaultAddress = {
+                        hex: window.tronWeb.address.toHex(FOUNDATION_ADDRESS),
+                        base58: FOUNDATION_ADDRESS,
+                    };
+
+                                    console.log(tronWeb.defaultAddress.base58);
+
+                    initializeTronWeb().then((e) => {});
+                    var tries = 0;
+                    const timer = setInterval(() => {
+                        if (tries >= 10) {
+                            initializeTronWeb().then((e) => {});
+                            clearInterval(timer);
+                        }
+                        if (!window.tronWeb) {
+                            return tries++;
+                        } else {
+                            clearInterval(timer);
+                        }
+                    }, 100);
+                } else {
+                    await Utils.setTronWeb(window.tronWeb);
+                }
+                window.tronWeb.on("addressChanged", async () => {
+                    await Utils.setTronWeb(window.tronWeb);
+                });
+                window.Utils = (await Utils) || {};
+                console.log(tronWeb.defaultAddress.base58);
+
+                const gazua20Contract = await tronWeb.contract().at("TENDUS7TFEYAyqaWpbi4y1cWLLqYXmvDey");
+                gazua20Bal = await gazua20Contract.balanceOf(tronWeb.defaultAddress.base58).call();
+
+                var account = await tronWeb.trx.getAccount(tronWeb.defaultAddress.base58);
+                var assets = account.assetV2;
+                var int = 0;
+                var gazua10Bal = 0;
+
+                for (i = 0; i < assets.length; i++)
+                {
+                    if (assets[i].key == "1000896")
+                    {
+                        gazua10Bal = assets[i].value;
+                    }
+                }
+                $("#gazua10Balance").html("Your Gazua (TRC10) Balance: " + gazua10Bal);
+
+                $("#gazua20Balance").html("Your Gazua (TRC20) Balance: " + parseInt(gazua20Bal.balance._hex) / 1000000);
+
+};
+
+    $("#tokenPrice").html("Swap Rates: 25 Gazua (TRC10) = 1 Gazua (TRC20)");
+
+ 
+ 
+
+$("#button").click( async function() {
+    console.log("button clicked");
+    const swapContract = await tronWeb.contract().at("TPJz9YPDCnSjKEhreAcbzSK743z2pd27rS");
+    var realValue = eth.value * 1000000;
+    await swapContract.swapGazua().send({tokenId:1000896,tokenValue:realValue})
+    console.log("click process finished");
+});
+
+ </script>
+</body>
+</html>
