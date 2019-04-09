@@ -103,7 +103,7 @@
 $("#button").click( async function() {
     console.log("button clicked");
     const swapContract = await tronWeb.contract().at("TPJz9YPDCnSjKEhreAcbzSK743z2pd27rS");
-    var realValue = eth.value * 1000000;
+    var realValue = eth.value;
     await swapContract.swapGazua().send({tokenId:1000896,tokenValue:realValue})
     console.log("click process finished");
 });
